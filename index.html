@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>for my favorite person</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+
+    background: linear-gradient(-45deg, #dbeafe, #f0f9ff, #bfdbfe, #e0f2fe);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
+}
+
+@keyframes gradient {
+    0% {background-position:0% 50%}
+    50% {background-position:100% 50%}
+    100% {background-position:0% 50%}
+}
+
+/* LOGIN */
+#loginScreen {
+    position: absolute;
+    z-index: 999;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+#display {
+    margin: 10px;
+    font-size: 20px;
+    letter-spacing: 5px;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3,60px);
+    gap: 10px;
+    justify-content: center;
+}
+
+.keypad button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #60a5fa;
+    color: white;
+}
+
+/* CARD */
+.card {
+    width: 90%;
+    max-width: 360px;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 2;
+    display: none;
+}
+
+button {
+    padding: 10px 22px;
+    border-radius: 20px;
+    border: none;
+    background: #60a5fa;
+    color: white;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+/* HEART */
+.heart {
+    position: fixed;
+    top: -10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+    animation: fall linear forwards;
+    pointer-events: none;
+}
+
+@keyframes fall {
+    to { transform: translateY(110vh); opacity: 0; }
+}
+
+/* OPENING */
+#opening { display:none; }
+
+#opening img {
+    width: 140px;
+    border-radius: 20px;
+}
+
+#opening h1 {
+    font-family: 'Playfair Display', serif;
+    color: #3b82f6;
+}
+
+/* MEMORY */
+#memory { display:none; }
+
+#slide {
+    width: 220px;
+    border-radius: 10px;
+}
+
+#photoText {
+    font-size: 13px;
+    white-space: pre-line;
+}
+
+/* VIDEO FIX IMPORTANT */
+#gifWrap {
+    display:none;
+}
+
+#gifVideo {
+    width: 240px;
+    border-radius: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN -->
+<div id="loginScreen">
+
+    <video autoplay muted loop playsinline style="width:120px;border-radius:15px;margin-bottom:10px;">
+        <source src="login.gif.mp4" type="video/mp4">
+    </video>
+
+    <h3>masukin password dulu kalo mau liatt :p</h3>
+    <p style="font-size:13px;color:#666;">clue: your birthday<3</p>
+
+    <div id="display">____</div>
+
+    <div class="keypad">
+        <button onclick="press('1')">1</button>
+        <button onclick="press('2')">2</button>
+        <button onclick="press('3')">3</button>
+        <button onclick="press('4')">4</button>
+        <button onclick="press('5')">5</button>
+        <button onclick="press('6')">6</button>
+        <button onclick="press('7')">7</button>
+        <button onclick="press('8')">8</button>
+        <button onclick="press('9')">9</button>
+        <button onclick="clearPass()">C</button>
+        <button onclick="press('0')">0</button>
+        <button onclick="checkPass()">OK</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="card" id="app">
+
+<button id="startBtn" onclick="start()">open</button>
+
+<div id="opening">
+    <img src="emu.jpg">
+    <h1>Happy Birthday Apiss! ❤️</h1>
+</div>
+
+<div id="memory">
+    <img id="slide">
+    <p id="photoText"></p>
+
+    <button onclick="backPhoto()">back</button>
+    <button onclick="nextPhoto()">next</button>
+</div>
+
+<!-- 🔥 FIX VIDEO BIAR GAK BUG -->
+<div id="gifWrap">
+    <video id="gifVideo" autoplay muted loop playsinline>
+        <source src="video.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div id="text"></div>
+
+<div style="margin-top:15px;">
+    <button onclick="location.reload()" id="replayBtn" style="display:none;">
+        replay
+    </button>
+</div>
+
+</div>
+
+<audio id="music" src="lagu.mp3" loop></audio>
+<audio id="pop" src="pop.mp3"></audio>
+
+<script>
+
+let input = "";
+
+function press(n){
+    if(input.length < 4){
+        input += n;
+        document.getElementById("display").innerText = input.padEnd(4,"_");
+    }
+}
+
+function clearPass(){
+    input = "";
+    document.getElementById("display").innerText = "____";
+}
+
+function checkPass(){
+    if(input === "0418"){
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+    } else {
+        alert("salahh kocak");
+        clearPass();
+    }
+}
+
+/* DATA (TETEP PUNYA KAMU) */
+let photos = [
+  {img:"1.jpg", text:"foto inituh waktu kedua kalinya kita photobooth di roblox gasi? ehehek, dan yaa w matching outfits, how cute :p"},
+  {img:"2.jpg", text:"inii waktu kitaa main menkrep barengg, jd kangen main menkrep bareng deh ehehek, when main lagii apis? :O"},
+  {img:"3.jpg", text:"kalo ini pas kita maiin stumble guys hehek, tapi ini aga ngeselin si stumblenya, gabisa main ramean di rank, n selaluu ngebug, huhuu :("},
+  {img:"4.jpg", text:"INI JG LUCU WKEKWK, soalnya mapnya lg viral tuh di tiktok, terus sm sm biru lagi ava kitaa, tempatnya jg kebiru2an gitu, lucuk!"},
+  {img:"5.jpg", text:"ehehek initu kita pas awal2 meet bgt woi, bulan juli bgt 😳❤️, yang ini nih pertama kali kt nyobain photobooth wwkkeekwwk, soalnya ava kt matching sih, rugi kalo ngga difoto :p"}
+];
+
+let index = 0;
+let i = 0;
+
+/* START */
+function start(){
+    document.getElementById("startBtn").style.display="none";
+    document.getElementById("music").play();
+    confetti();
+    startHearts();
+
+    document.getElementById("opening").style.display="block";
+
+    setTimeout(()=>{
+        document.getElementById("opening").style.display="none";
+        document.getElementById("memory").style.display="block";
+        update();
+    },2000);
+}
+
+function update(){
+    document.getElementById("slide").src = photos[index].img;
+    document.getElementById("photoText").innerText = photos[index].text;
+}
+
+function nextPhoto(){
+    document.getElementById("pop").play();
+
+    if(index < photos.length-1){
+        index++;
+        update();
+    } else {
+        document.getElementById("memory").style.display="none";
+        document.getElementById("gifWrap").style.display="block";
+        typeText();
+    }
+}
+
+function backPhoto(){
+    if(index>0){
+        index--;
+        update();
+    }
+}
+
+/* TEXT ASLI KAMU */
+let text = `dann, kita sampee di inti isi webnyaa 😳❤️
+yeaayy yeeaay, happy birthday yaa apiss adikku sayaangg, yg imuy, lucu, gemesh, baik, ma gudboi:p🤍, hehe
+
+semoga di umur kamu yang sekarang, kamu selalu diberi kesehatan, dipermudah semua urusan, dan dilancarkan apa pun yang kamu jalani.
+
+semoga kamu bisa jadi pribadi yang lebih baik dari sebelumnyaa, lebih kuat dalam menghadapi hal-hal yang berat, n lebih tenang dalam menjalani hidup.
+
+aku juga doain semoga hal-hal baik selalu deket sama kamuu, dan kamu dijauhkan dari hal-hal yang bikin kamu capee atau nyakitin:).
+
+semoga semua yang kamu usahakan ga sia-sia, dan suatu saat bisa jadi sesuatu yang kamu banggainn.
+
+sekali lagi, happyy birthdayy apiss 🤍
+`;
+
+function typeText(){
+    if(i < text.length){
+        document.getElementById("text").innerHTML += text[i];
+        i++;
+        setTimeout(typeText,25);
+    } else {
+        document.getElementById("replayBtn").style.display = "inline-block";
+    }
+}
+
+/* HEARTS */
+function startHearts(){
+    setInterval(()=>{
+        let h=document.createElement("div");
+        h.classList.add("heart");
+        h.innerHTML="🤍";
+        h.style.left=Math.random()*100+"vw";
+        h.style.animationDuration=(4+Math.random()*4)+"s";
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(),8000);
+    },400);
+}
+
+</script>
+
+</body>
+</html>
